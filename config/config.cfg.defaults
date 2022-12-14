@@ -1,6 +1,17 @@
-LOG_PATH="./logs"
-FILE_AGE="14"
 DAY=1
+MAX_DAY=7
+
+LOG_FILE_EXT="txt"
+ARCHIVE_FILE_EXT="txt"
+
 E_TIME='10:00:00'
-ARCHIVE_FILE_AGE="7"
+LOG_PATH="./logs"
+ARCHIVE_PATH="../logs"
+
+AGE_OF_LOG_FILE="14"
+AGE_OF_ARCHIVE_FILE="7"
+
+E_TIME='10:00:00'
+
+Scripts=("scripts\archive.sh","scripts\remove.sh")
 

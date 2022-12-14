@@ -9,3 +9,4 @@ config_get() {
     fi
     printf -- "%s" "${val}";
 }
+
