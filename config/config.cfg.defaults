@@ -1,17 +1,42 @@
+#-------------------------------------------------------------#
+#Launcher Configration
+#day of the week
+#[1..7]days  1 is Monday
 DAY=1
+
+#Not recommend to change MAX_DAY
 MAX_DAY=7
 
-LOG_FILE_EXT="txt"
-ARCHIVE_FILE_EXT="txt"
+#exicution time
+E_TIME=13:14:00
 
-E_TIME='10:00:00'
-LOG_PATH="./logs"
-ARCHIVE_PATH="../logs"
+#scripts that need to execute
+Scripts=archive.sh remove.sh
 
-AGE_OF_LOG_FILE="14"
-AGE_OF_ARCHIVE_FILE="7"
+#--------------------------------------------------------------#
+#comman path for 
+FILE_PATH=/spacelogs
 
-E_TIME='10:00:00'
 
-Scripts=("scripts\archive.sh","scripts\remove.sh")
+#Log Configration
+
+#set the age of file [ 1..30 ]
+AGE_OF_LOG_FILE=14
+#set the extention of file
+LOG_FILE_EXT=txt
+
+#--------------------------------------------------------------#
+
+#Archive Configration
+
+#path of  files that need to be Archive
+
+#set the age of file [ 1..30  ]
+AGE_OF_ARCHIVE_FILE=7
+
+#set the extention of file
+ARCHIVE_FILE_EXT=txt
+
+#--------------------------------------------------------------#
+
 
