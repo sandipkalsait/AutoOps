@@ -1,5 +1,5 @@
 # script-details :
-automated log file deletion per week
+automated execution of script per week
 
 # Configuration changes
 to new config changes do inside of config.cfg
