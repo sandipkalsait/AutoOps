@@ -25,6 +25,9 @@ FILE_PATH=/spacelogs
 # FILE DELETION 
 for each execution it will delete all
 log files older than 14 days
+
+and
+
 archived files older than 7 days
 
 # ARCHIVE FILES 
@@ -32,7 +35,7 @@ Compress all log files
 log files older than 7
 
 
-#NEW SCRIPT CREATIONS 
+# NEW SCRIPT CREATIONS 
 place the new script in script folder
 and add the script-file name in config.cfg file
 restart the launcher script
