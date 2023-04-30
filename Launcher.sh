@@ -1,93 +1,112 @@
-#!/usr/bin/env bash
-source ./config/config.shlib; # load the config library functions
-   
-    # echo "$(config_get myvar)"; # will be found in user-cfg
-    # printf -- "%s\n" "$(config_get myvar)"; # safer way of echoing!
-    # myvar="$(config_get myvar)"; # how to just read a value without echoing
-    # echo "$(config_get othervar)"; # will fall back to defaults
-    # echo "$(config_get bleh)"; # "__UNDEFINED__" since it isn't set anywhere
+#!/bin/bash
+#
+BASE=/tmp
+PID=/tmp/app.pid
+LOG=/tmp/app.log
+ERROR=/tmp/app-error.log
 
-#fetch configration
-DAY="$(config_get DAY)"
-TIME="$(config_get E_TIME)"
-E_TIME=$(date -d "$TIME" "+%s")
+# PORT=11200
+# LISTEN_IP = '0.0.0.0'
+# MEM_SIZE=4
+# CMD=''
+# COMMAND='$CMD -p $PORT -l $LISTEN_IP -d -m $MEM_SIZE -v -p $PID'
 
+# USR=user
 
-#Fetch ALL Script Files
-scripts=("$(config_get Scripts)")
+COMMAND='nohup bash Launcher.sh &'
 
+status() {
+    echo
+    echo "==== Status"
 
-echo  "Launcher Script has been Started on $(date) ..."
+    if [ -f $PID ]
+    then
+        echo
+        echo "Pid file: $( cat $PID ) [$PID]"
+        echo
+        ps -ef | grep -v grep | grep $( cat $PID )
+    else
+        echo
+        echo "No Pid file"
+    fi
+}
 
-while true;
-do
-
-        C_DAY=$(date "+%u")
-        # echo $C_DAY
-        if [[ "$C_DAY" = "$DAY" ]];
-        then 
-           
-           Current_epoch=$(date "+%s")
-           
-           #    Current_epoch=$(date -d "00:00:00" "+%s")
-           start_day=$(date -d "00:00:00" "+%s")
-           if [[ "$start_day" = "$Current_epoch" ]];
-           then 
-                    # echo "before sleep "
-                    # echo $before_sleep
-                    sleep  $before_sleep
-
-           
-           Current_epoch=$(date "+%s")
-           elif [[ "$Current_epoch" = "$E_TIME" ]];
-           then 
-                    #echo $Current_epoch
-                     echo "Execution started  ..."
-                    #READ ALL Script Files
-                    read -a scripts_arr <<< $scripts
-                    # echo ${scripts_arr[@]}
-                    count=${#scripts_arr[@]}
-                    pwd
-                    # echo $count
-                    for (( i=0; i<${count}; i++))
-                    do
-                        bash ./scripts/${scripts_arr[$i]}
-                        sleep 10
-                    done
-                    echo "Execution ended  ..."
-
-            Current_epoch=$(date "+%s")
-            elif [[ "$Current_epoch" > "$E_TIME" ]];
-            then
-            
-                    Current_epoch=$(date "+%s");
-                    
-                    # echo $Current_epoch;
-                    # echo $E_TIME;
-                    end_day=$(date -d "23:59:59" "+%s")
-                    # echo $end_day;
-                    sleep_sec=$(( "$end_day" - "$E_TIME" ))
-                    # echo "after sleep "
-                    sleep  $sleep_sec 
-                    
-            
-            fi
-                      
-            
-
-
-        else 
-            C_DAY=$(date "+%u")
-            sleep_for_days=$(( "$(config_get MAX_DAY)" - "$C_DAY" ))"d"
-            #echo "$(config_get MAX_DAY)"
-            # echo "sleep for $sleep_for_days days"
-            sleep $sleep_for_days
-
+start() {
+    if [ -f $PID ]
+    then
+        echo
+        echo "Already started. PID: [$( cat $PID )]"
+    else
+        echo "==== Start"
+        touch $PID
+        if nohup $COMMAND >>$LOG 2>&1 &
+        then echo $! >$PID
+             echo "Done."
+             echo "$(date '+%Y-%m-%d %X'): START" >>$LOG
+        else echo "Error... "
+             /bin/rm $PID
         fi
-done
+    fi
+}
 
+kill_cmd() {
+    SIGNAL=""; MSG="Killing "
+    while true
+    do
+        LIST=`ps -ef | grep -v grep | grep $CMD | grep -w $USR | awk '{print $2}'`
+        if [ "$LIST" ]
+        then
+            echo; echo "$MSG $LIST" ; echo
+            echo $LIST | xargs kill $SIGNAL
+            sleep 2
+            SIGNAL="-9" ; MSG="Killing $SIGNAL"
+            if [ -f $PID ]
+            then
+                /bin/rm $PID
+            fi
+        else
+           echo; echo "All killed..." ; echo
+           break
+        fi
+    done
+}
 
+stop() {
+    echo "==== Stop"
 
+    if [ -f $PID ]
+    then
+        if kill $( cat $PID )
+        then echo "Done."
+             echo "$(date '+%Y-%m-%d %X'): STOP" >>$LOG
+        fi
+        /bin/rm $PID
+        kill_cmd
+    else
+        echo "No pid file. Already stopped?"
+    fi
+}
 
+case "$1" in
+    'start')
+            start
+            ;;
+    'stop')
+            stop
+            ;;
+    'restart')
+            stop ; echo "Sleeping..."; sleep 1 ;
+            start
+            ;;
+    'status')
+            status
+            ;;
+    *)
+            echo
+            echo "Usage: $0 { start | stop | restart | status }"
+            echo
+            exit 1
+            ;;
+esac
 
-
+exit 0

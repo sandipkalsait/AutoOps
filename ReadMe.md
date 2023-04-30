@@ -1,4 +1,4 @@
-# script-details :
+# Script-details :
 automated execution of script per week
 
 # Configuration changes
