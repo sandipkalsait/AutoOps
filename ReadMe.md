@@ -44,24 +44,18 @@ restart the launcher script
 # How to start script
 to start script use following command
 
-nohup bash Log_deletion.sh &
+bash Launcher.sh start
+or 
+./Launcher.sh start
 
 # TO stop script
-you need to check the process ID
-so
- use following command
- ps
+to stop script use following command
 
-then for 
-   script process-id
+bash Launcher.sh start
+or
+./Launcher.sh stop
 
-use following command
 
-kill -9 <process-id>
-
-eg.
-
-kill -9 34833
 
 after than you have to delete
 nohup.out file 
