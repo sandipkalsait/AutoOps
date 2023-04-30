@@ -13,18 +13,19 @@ ERROR=/tmp/app-error.log
 
 # USR=user
 
-COMMAND='nohup bash Launcher.sh &'
+COMMAND='Launcher.sh'
+# echo $COMMAND
 
 status() {
     echo
-    echo "==== Status"
+    echo "= Status ="
 
     if [ -f $PID ]
     then
         echo
         echo "Pid file: $( cat $PID ) [$PID]"
         echo
-        ps -ef | grep -v grep | grep $( cat $PID )
+        ps -ef |  grep $( cat $PID )
     else
         echo
         echo "No Pid file"
@@ -37,7 +38,7 @@ start() {
         echo
         echo "Already started. PID: [$( cat $PID )]"
     else
-        echo "==== Start"
+        echo "= Start ="
         touch $PID
         if nohup $COMMAND >>$LOG 2>&1 &
         then echo $! >$PID
@@ -53,7 +54,8 @@ kill_cmd() {
     SIGNAL=""; MSG="Killing "
     while true
     do
-        LIST=`ps -ef | grep -v grep | grep $CMD | grep -w $USR | awk '{print $2}'`
+        LIST=`ps -ef |  grep $CMD | grep -w $USR | awk '{print $2}'`
+        echo $LIST
         if [ "$LIST" ]
         then
             echo; echo "$MSG $LIST" ; echo
@@ -72,11 +74,11 @@ kill_cmd() {
 }
 
 stop() {
-    echo "==== Stop"
+    echo "= Stop ="
 
     if [ -f $PID ]
     then
-        if kill $( cat $PID )
+        if kill  $( cat $PID )
         then echo "Done."
              echo "$(date '+%Y-%m-%d %X'): STOP" >>$LOG
         fi
