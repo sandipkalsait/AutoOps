@@ -1,63 +1,58 @@
 #!/usr/bin/env bash
-source ./config/config.shlib;
+source ./config/config.shlib
 
-# echo "Start Archive ..."
+# Color codes
+RED='\033[0;31m'
+GREEN='\033[0;32m'
+YELLOW='\033[1;33m'
+NC='\033[0m' # No Color
+
+echo -e "${GREEN}Start Archive ...${NC}"
+
 paths="$(config_get FILE_PATHS)"
-# home="$(config_get HOME_PATH)"
 ext="$(config_get ARCHIVE_FILE_EXT)"
-
 
 declare -a FILE_PATHS
 
-#Get all files orlder than x days
-
-for path in $paths
-do
-    FILE_PATHS=(${FILE_PATHS[*]} "$path")
+# Populate FILE_PATHS array
+for path in $paths; do
+    FILE_PATHS+=("$path")
 done
-
-
-
 
 declare -a FILES
 
-#Get all files orlder than x days
-
-for file in $(find .$path -type f -name "*.$ext")
-do
-    FILES=(${FILES[*]} "$file")
+# Populate FILES array
+for path in "${FILE_PATHS[@]}"; do
+    for file in $(find "$path" -type f -name "*.$ext"); do
+        FILES+=("$file")
+    done
 done
 
-
-#check length of an path array
+# Check length of the arrays
 pathArrayLength=${#FILE_PATHS[@]}
-
-#check length of an file array
 fileArrayLength=${#FILES[@]}
 
-# echo "Start Archive ..."
-for ((i=0;i<${pathArrayLength};i++))
-do
-    #check 
-    #echo ${FILE_PATHS[$i]}
+if [ $pathArrayLength -eq 0 ]; then
+    echo -e "${RED}No paths found to archive.${NC}"
+    exit 1
+fi
 
-    for ((j=0; j<${fileArrayLength}; j++))
-    do
-    tar -uvf .${FILE_PATHS[$i]}"/log_$(date "+%d-%m-%Y")".tar  ${FILES[$j]}
-    # echo "tar -uvf .${FILE_PATHS[$i]}"/log_$(date "+%d-%m-%Y")".tar ${FILES[$j]}"
-    sleep 5 
+if [ $fileArrayLength -eq 0 ]; then
+    echo -e "${YELLOW}No files found to archive.${NC}"
+    exit 1
+fi
+
+# Archive files
+for ((i=0; i<pathArrayLength; i++)); do
+    for ((j=0; j<fileArrayLength; j++)); do
+        tar -uvf "${FILE_PATHS[$i]}/log_$(date "+%d-%m-%Y").tar" "${FILES[$j]}"
+        if [ $? -eq 0 ]; then
+            echo -e "${GREEN}Archived: ${FILES[$j]}${NC}"
+        else
+            echo -e "${RED}Failed to archive: ${FILES[$j]}${NC}"
+        fi
+        sleep 5
     done
-
 done
 
-# echo "Archive process end ..."
-
-
-
-
-
-# echo "End Archive ..."
-
-
-
-
+echo -e "${GREEN}Archive process end ...${NC}"
